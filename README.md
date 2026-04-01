@@ -1,12 +1,54 @@
 # Text Analyzer
 
+Text Analyzer is a Flask-based web application used in DevOps lab experiments for Docker and Kubernetes.
+
+Students should follow the lab files in this order:
+
+1. `DevOps8.md` - Integrating Docker and Kubernetes workflow
+2. `DevOps9.md` - automated Kubernetes deployment using YAML manifests
+
+## Lab Files
+
+### Experiment 8
+
+Use:
+
+- `DevOps8.md`
+
+This experiment covers:
+
+- cloning the project
+- building the Docker image
+- running the app locally
+- manually creating Kubernetes resources with `kubectl`
+
+### Experiment 9
+
+Use:
+
+- `DevOps9.md`
+- `k8s/deployment.yaml`
+- `k8s/service.yaml`
+- `k8s/ingress.yaml`
+
+This experiment covers:
+
+- automated deployment using manifest files
+- applying Kubernetes YAML files
+- scaling and restarting deployments
+- viewing rollout history
+- deleting resources using manifest files
+
 ## Project Structure
 
 ```text
 text-analyzer/
 ├── app/
+│   └── analyzer.py
 ├── static/
+│   └── style.css
 ├── templates/
+│   └── index.html
 ├── k8s/
 │   ├── deployment.yaml
 │   ├── service.yaml
@@ -19,15 +61,7 @@ text-analyzer/
 └── run.py
 ```
 
-## DevOps Lab Files
-
-- `DevOps8.md` - Experiment 8 manual Kubernetes deployment lab
-- `DevOps9.md` - Experiment 9 automated deployment lab using YAML manifests
-- `k8s/deployment.yaml` - Deployment definition
-- `k8s/service.yaml` - Service definition
-- `k8s/ingress.yaml` - Ingress definition
-
-## Run locally
+## Run Locally Without Docker
 
 ```bash
 python -m venv venv
@@ -39,7 +73,7 @@ Windows PowerShell:
 venv\Scripts\Activate.ps1
 ```
 
-Install dependencies and start the app:
+Install dependencies and run:
 
 ```bash
 pip install -r requirements.txt
@@ -52,13 +86,15 @@ Open:
 http://localhost:5000
 ```
 
-## Build Docker image
+## Build and Run with Docker
+
+Build the image:
 
 ```bash
 docker build -t text-analyzer:latest .
 ```
 
-## Run Docker image
+Run the container:
 
 ```bash
 docker run -p 5000:5000 text-analyzer:latest
@@ -70,7 +106,7 @@ Open:
 http://localhost:5000
 ```
 
-## Push to Docker Hub
+## Push the Image to Docker Hub
 
 ```bash
 docker login
@@ -78,7 +114,7 @@ docker tag text-analyzer:latest miraaqib786/text-analyzer:latest
 docker push miraaqib786/text-analyzer:latest
 ```
 
-Optional versioned tag:
+Optional version tag:
 
 ```bash
 docker tag text-analyzer:latest miraaqib786/text-analyzer:v1

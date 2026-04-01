@@ -1,5 +1,32 @@
 # Text Analyzer
 
+## Project Structure
+
+```text
+text-analyzer/
+├── app/
+├── static/
+├── templates/
+├── k8s/
+│   ├── deployment.yaml
+│   ├── service.yaml
+│   └── ingress.yaml
+├── DevOps8.md
+├── DevOps9.md
+├── Dockerfile
+├── .dockerignore
+├── requirements.txt
+└── run.py
+```
+
+## DevOps Lab Files
+
+- `DevOps8.md` - Experiment 8 manual Kubernetes deployment lab
+- `DevOps9.md` - Experiment 9 automated deployment lab using YAML manifests
+- `k8s/deployment.yaml` - Deployment definition
+- `k8s/service.yaml` - Service definition
+- `k8s/ingress.yaml` - Ingress definition
+
 ## Run locally
 
 ```bash

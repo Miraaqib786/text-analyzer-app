@@ -2,30 +2,92 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Text Analyzer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-<div class="container">
-    <h1>Text Analyzer</h1>
-    <textarea id="text-input" placeholder="Enter your text here...">{{ text }}</textarea>
+<div class="page-shell">
+    <div class="background-orb orb-one"></div>
+    <div class="background-orb orb-two"></div>
 
-    <div class="live-result">
-        <h2>Live Analysis</h2>
-        <p><strong>Characters:</strong> <span id="char-count">0</span></p>
-        <p><strong>Words:</strong> <span id="word-count">0</span></p>
-        <p><strong>Sentences:</strong> <span id="sentence-count">0</span></p>
-        <p><strong>Paragraphs:</strong> <span id="paragraph-count">0</span></p>
-        <p><strong>Average Word Length:</strong> <span id="avg-word-length">0</span></p>
-        <p><strong>Top 5 Words:</strong> <span id="top-words">-</span></p>
-        <canvas id="wordChart" width="400" height="200"></canvas>
-    </div>
+    <main class="container">
+        <section class="hero">
+            <p class="eyebrow">Text Intelligence</p>
+            <h1>Analyze writing with instant visual feedback.</h1>
+            <p class="hero-copy">
+                Paste anything from a note to a draft article and inspect the structure, density, and most repeated terms in real time.
+            </p>
+        </section>
 
-    <div class="buttons">
-        <button type="button" onclick="copyResults()">Copy Results</button>
-        <button type="button" onclick="downloadJSON()">Download JSON</button>
-        <button type="button" onclick="downloadCSV()">Download CSV</button>
-    </div>
+        <section class="workspace">
+            <div class="panel input-panel">
+                <div class="panel-header">
+                    <div>
+                        <p class="panel-label">Input</p>
+                        <h2>Write or paste text</h2>
+                    </div>
+                    <span class="panel-badge">Live</span>
+                </div>
+                <textarea id="text-input" placeholder="Enter your text here...">{{ text }}</textarea>
+                <div class="buttons">
+                    <button type="button" onclick="copyResults()">Copy Results</button>
+                    <button type="button" onclick="downloadJSON()">Download JSON</button>
+                    <button type="button" onclick="downloadCSV()">Download CSV</button>
+                </div>
+            </div>
+
+            <div class="panel output-panel">
+                <div class="panel-header">
+                    <div>
+                        <p class="panel-label">Analysis</p>
+                        <h2>Live metrics</h2>
+                    </div>
+                </div>
+
+                <div class="stats-grid">
+                    <article class="stat-card accent-coral">
+                        <p class="stat-label">Characters</p>
+                        <span id="char-count" class="stat-value">0</span>
+                    </article>
+                    <article class="stat-card accent-gold">
+                        <p class="stat-label">Words</p>
+                        <span id="word-count" class="stat-value">0</span>
+                    </article>
+                    <article class="stat-card accent-mint">
+                        <p class="stat-label">Sentences</p>
+                        <span id="sentence-count" class="stat-value">0</span>
+                    </article>
+                    <article class="stat-card accent-blue">
+                        <p class="stat-label">Paragraphs</p>
+                        <span id="paragraph-count" class="stat-value">0</span>
+                    </article>
+                </div>
+
+                <div class="detail-grid">
+                    <article class="detail-card">
+                        <p class="detail-title">Average Word Length</p>
+                        <p class="detail-value"><span id="avg-word-length">0</span> chars</p>
+                    </article>
+                    <article class="detail-card">
+                        <p class="detail-title">Top 5 Words</p>
+                        <p class="detail-value detail-list" id="top-words">-</p>
+                    </article>
+                </div>
+
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <p class="detail-title">Word Frequency Snapshot</p>
+                        <span class="chart-note">Top repeated terms</span>
+                    </div>
+                    <canvas id="wordChart" width="400" height="200"></canvas>
+                </div>
+            </div>
+        </section>
+    </main>
 </div>
 
 <script>
@@ -86,10 +148,11 @@ function drawChart(topWords) {
         const x = i*2*barWidth + barWidth/2;
         const y = canvas.height - barHeight - 20;
 
-        ctx.fillStyle = '#007bff';
+        ctx.fillStyle = '#2d6df6';
         ctx.fillRect(x,y,barWidth,barHeight);
 
-        ctx.fillStyle = '#000';
+        ctx.fillStyle = '#14213d';
+        ctx.font = '12px "IBM Plex Mono", monospace';
         ctx.textAlign = 'center';
         ctx.fillText(item.word,x+barWidth/2,canvas.height-5);
         ctx.fillText(item.count,x+barWidth/2,y-5);

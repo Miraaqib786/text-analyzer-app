@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Text Analyzer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="container">
+    <h1>Text Analyzer</h1>
+    <textarea id="text-input" placeholder="Enter your text here...">{{ text }}</textarea>
+
+    <div class="live-result">
+        <h2>Live Analysis</h2>
+        <p><strong>Characters:</strong> <span id="char-count">0</span></p>
+        <p><strong>Words:</strong> <span id="word-count">0</span></p>
+        <p><strong>Sentences:</strong> <span id="sentence-count">0</span></p>
+        <p><strong>Paragraphs:</strong> <span id="paragraph-count">0</span></p>
+        <p><strong>Average Word Length:</strong> <span id="avg-word-length">0</span></p>
+        <p><strong>Top 5 Words:</strong> <span id="top-words">-</span></p>
+        <canvas id="wordChart" width="400" height="200"></canvas>
+    </div>
+
+    <div class="buttons">
+        <button type="button" onclick="copyResults()">Copy Results</button>
+        <button type="button" onclick="downloadJSON()">Download JSON</button>
+        <button type="button" onclick="downloadCSV()">Download CSV</button>
+    </div>
+</div>
+
+<script>
+const textInput = document.getElementById('text-input');
+const charCount = document.getElementById('char-count');
+const wordCount = document.getElementById('word-count');
+const sentenceCount = document.getElementById('sentence-count');
+const paragraphCount = document.getElementById('paragraph-count');
+const avgWordLength = document.getElementById('avg-word-length');
+const topWordsElem = document.getElementById('top-words');
+const canvas = document.getElementById('wordChart');
+const ctx = canvas.getContext('2d');
+
+function analyzeTextLive(text) {
+    const characters = text.length;
+    const words = text.match(/\b\w+\b/g) || [];
+    const wordCountVal = words.length;
+    const sentences = text.split(/[.!?]/).filter(s => s.trim().length>0).length;
+    const paragraphs = text.split(/\n+/).filter(p => p.trim().length>0).length;
+    const avgLen = wordCountVal ? (words.reduce((a,b)=>a+b.length,0)/wordCountVal).toFixed(2) : 0;
+
+    const counter = {};
+    words.forEach(w=>{
+        const word = w.toLowerCase();
+        counter[word] = (counter[word]||0)+1;
+    });
+    const topWords = Object.entries(counter)
+        .sort((a,b)=>b[1]-a[1])
+        .slice(0,5)
+        .map(e=>({word:e[0],count:e[1]}));
+
+    return {characters, wordCount: wordCountVal, sentences, paragraphs, avgLen, topWords};
+}
+
+function updateMetrics() {
+    const text = textInput.value;
+    const result = analyzeTextLive(text);
+
+    charCount.textContent = result.characters;
+    wordCount.textContent = result.wordCount;
+    sentenceCount.textContent = result.sentences;
+    paragraphCount.textContent = result.paragraphs;
+    avgWordLength.textContent = result.avgLen;
+    topWordsElem.textContent = result.topWords.map(e=>`${e.word}(${e.count})`).join(', ') || '-';
+
+    drawChart(result.topWords);
+}
+
+function drawChart(topWords) {
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    if(!topWords.length) return;
+
+    const maxCount = Math.max(...topWords.map(e=>e.count));
+    const barWidth = canvas.width / (topWords.length * 2);
+
+    topWords.forEach((item,i)=>{
+        const barHeight = (item.count / maxCount) * (canvas.height-30);
+        const x = i*2*barWidth + barWidth/2;
+        const y = canvas.height - barHeight - 20;
+
+        ctx.fillStyle = '#007bff';
+        ctx.fillRect(x,y,barWidth,barHeight);
+
+        ctx.fillStyle = '#000';
+        ctx.textAlign = 'center';
+        ctx.fillText(item.word,x+barWidth/2,canvas.height-5);
+        ctx.fillText(item.count,x+barWidth/2,y-5);
+    });
+}
+
+textInput.addEventListener('input', updateMetrics);
+
+function copyResults() {
+    const text = `Characters: ${charCount.textContent}
+Words: ${wordCount.textContent}
+Sentences: ${sentenceCount.textContent}
+Paragraphs: ${paragraphCount.textContent}
+Average Word Length: ${avgWordLength.textContent}
+Top Words: ${topWordsElem.textContent}`;
+    navigator.clipboard.writeText(text).then(()=>alert("Copied to clipboard!"));
+}
+
+function downloadJSON() {
+    const data = {
+        characters: charCount.textContent,
+        words: wordCount.textContent,
+        sentences: sentenceCount.textContent,
+        paragraphs: paragraphCount.textContent,
+        average_word_length: avgWordLength.textContent,
+        top_words: topWordsElem.textContent.split(', ').filter(x=>x)
+    };
+    const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url;
+    a.download='text_analysis.json';
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+function downloadCSV() {
+    const csv=`Metric,Value
+Characters,${charCount.textContent}
+Words,${wordCount.textContent}
+Sentences,${sentenceCount.textContent}
+Paragraphs,${paragraphCount.textContent}
+Average Word Length,${avgWordLength.textContent}
+Top Words,"${topWordsElem.textContent}"`;
+    const blob=new Blob([csv],{type:'text/csv'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url;
+    a.download='text_analysis.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+updateMetrics();
+</script>
+</body>
+</html>
